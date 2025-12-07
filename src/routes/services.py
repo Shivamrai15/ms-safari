@@ -9,15 +9,18 @@ router = APIRouter(prefix="/services", tags=["Services"])
 class ServiceCreate(BaseModel):
     name: str
     url: str
+    metadata: dict | None = None
 
 class ServiceUpdate(BaseModel):
     name: str | None = None
     url: str | None = None
+    metadata: dict | None = None
 
 class ServiceResponse(BaseModel):
     id: str
     name: str
     url: str
+    metadata: dict | None = None
     created_at: str
     updated_at: str
 
@@ -30,6 +33,7 @@ async def get_all_services():
             id=str(service.id),
             name=service.name,
             url=service.url,
+            metadata=service.metadata,
             created_at=service.created_at.isoformat(),
             updated_at=service.updated_at.isoformat()
         )
@@ -48,6 +52,7 @@ async def get_service(service_id: str):
             id=str(service.id),
             name=service.name,
             url=service.url,
+            metadata=service.metadata,
             created_at=service.created_at.isoformat(),
             updated_at=service.updated_at.isoformat()
         )
@@ -59,7 +64,8 @@ async def create_service(service_data: ServiceCreate):
     """Create a new service"""
     service = Service(
         name=service_data.name,
-        url=service_data.url
+        url=service_data.url,
+        metadata=service_data.metadata
     )
     await service.insert()
     
@@ -67,6 +73,7 @@ async def create_service(service_data: ServiceCreate):
         id=str(service.id),
         name=service.name,
         url=service.url,
+        metadata=service.metadata,
         created_at=service.created_at.isoformat(),
         updated_at=service.updated_at.isoformat()
     )
@@ -83,6 +90,8 @@ async def update_service(service_id: str, service_data: ServiceUpdate):
             service.name = service_data.name
         if service_data.url is not None:
             service.url = service_data.url
+        if service_data.metadata is not None:
+            service.metadata = service_data.metadata
         
         from datetime import datetime
         service.updated_at = datetime.now()
@@ -92,6 +101,7 @@ async def update_service(service_id: str, service_data: ServiceUpdate):
             id=str(service.id),
             name=service.name,
             url=service.url,
+            metadata=service.metadata,
             created_at=service.created_at.isoformat(),
             updated_at=service.updated_at.isoformat()
         )
