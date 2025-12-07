@@ -24,7 +24,7 @@ class CheckAllResponse(BaseModel):
     checked_services: int
     results: List[StatusResponse]
 
-@router.post("/check-all", response_model=CheckAllResponse)
+@router.get("/check-all", response_model=CheckAllResponse)
 async def check_all_services():
     """
     Fetch all services, check their status, and store results in database
