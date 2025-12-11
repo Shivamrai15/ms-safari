@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from src.database import init_db
 from src.config import settings
-from src.routes import services, status
+from src.routes import services, status, error_logs
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -15,7 +15,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Maintenance Server API",
     description="API for monitoring service status and health",
-    version="1.0.0",
+    version="1.0.1",
     lifespan=lifespan
 )
 
@@ -29,13 +29,14 @@ app.add_middleware(
 
 app.include_router(services.router)
 app.include_router(status.router)
+app.include_router(error_logs.router)
 
 @app.get("/", tags=["Health"])
 async def health_check():
     return {
         "status": "healthy",
         "service": "Maintenance Server API",
-        "version": "1.0.0"
+        "version": "1.0.1"
     }
 
 @app.get("/health", tags=["Health"])

@@ -3,6 +3,7 @@ from beanie import init_beanie
 from src.config import settings
 from src.models.service import Service
 from src.models.status import Status
+from src.models.error_log import ErrorLog
 
 async def init_db():
     client = AsyncIOMotorClient(settings.MONGODB_URL)
@@ -13,6 +14,7 @@ async def init_db():
         database=database,
         document_models=[
             Service,
-            Status
+            Status,
+            ErrorLog
         ]
     )
