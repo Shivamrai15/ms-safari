@@ -5,6 +5,7 @@ from src.models.error_log import ErrorLog, AppInfo, DeviceInfo, UserContext, Nav
 from beanie import PydanticObjectId
 from datetime import datetime
 from typing import Literal, Dict, Any
+from src.utils.system_alerts import send_android_error
 
 router = APIRouter(prefix="/error-logs", tags=["Error Logs"])
 
@@ -104,6 +105,21 @@ async def create_error_log(error_data: ErrorLogCreate):
         metadata=error_data.metadata
     )
     await error_log.insert()
+    
+    # Send Telegram alert
+    try:
+        app_name = f"{error_data.app_info.environment} - v{error_data.app_info.app_version}"
+        error_type = error_data.error_code or error_data.severity.upper()
+        stacktrace = error_data.metadata.get("stacktrace", "") if error_data.metadata else ""
+        send_android_error(
+            app_name=app_name,
+            error_type=error_type,
+            error_message=error_data.message,
+            stacktrace=stacktrace
+        )
+    except Exception as e:
+        # Don't fail the request if alert fails
+        print(f"Failed to send Telegram alert: {e}")
     
     return error_log_to_response(error_log)
 

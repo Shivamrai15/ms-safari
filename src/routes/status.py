@@ -7,6 +7,7 @@ from src.utils.checker import check_service_status
 from src.config import settings
 from datetime import datetime
 import asyncio
+from src.utils.system_alerts import send_service_alert
 
 router = APIRouter(prefix="/status", tags=["Status"])
 
@@ -48,6 +49,21 @@ async def check_all_services():
         )
 
         await status_record.insert()
+        
+        # Send Telegram alert for DOWN or UNHEALTHY services
+        if status_data["status"] in ["DOWN", "UNHEALTHY"]:
+            try:
+                message = f"Response Code: {status_data['response_code']}\n"
+                message += f"Latency: {status_data['latency_ms']:.2f}ms\n"
+                if status_data["error_message"]:
+                    message += f"Error: {status_data['error_message']}"
+                send_service_alert(
+                    service_name=service.name,
+                    status=status_data["status"],
+                    message=message
+                )
+            except Exception as e:
+                print(f"Failed to send Telegram alert for {service.name}: {e}")
         
         results.append(StatusResponse(
             id=str(status_record.id),
