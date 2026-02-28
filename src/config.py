@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     REQUEST_TIMEOUT: int = 10
     TELEGRAM_BOT_TOKEN: str
     TELEGRAM_CHAT_ID: str
+    JWT_SECRET: str
+    REDIS_URL: str
 
     class Config:
         env_file = ".env"

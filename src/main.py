@@ -3,13 +3,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from src.database import init_db
 from src.config import settings
-from src.routes import services, status, error_logs
+from src.routes import services, status, error_logs, history
+from src.utils.queue import queue
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db()
     print("Database initialized successfully")
     yield
+    await queue.close()
     print("Shutting down...")
 
 app = FastAPI(
@@ -30,6 +32,7 @@ app.add_middleware(
 app.include_router(services.router)
 app.include_router(status.router)
 app.include_router(error_logs.router)
+app.include_router(history.router)
 
 @app.get("/", tags=["Health"])
 async def health_check():
