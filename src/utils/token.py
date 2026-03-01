@@ -18,7 +18,7 @@ async def auth_middleware(request: Request) -> dict:
         raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
     
     token = auth_header.split("Bearer ")[1]
-    print(f"Received token: {settings.JWT_SECRET}")  # Debugging log
+    
     try:
         payload = verify_token(token, settings.JWT_SECRET)
     except Exception as e:
